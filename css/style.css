@@ -4,7 +4,7 @@ body {
 }
 
 header h1 {
-    color: blueviolet;
+    color: rgb(138, 44, 226);
     text-align: center;
     font-style: italic;
 }
@@ -17,5 +17,5 @@ header h1 {
 #images-div img {
     width: 300px;
     height: 400px;
-    padding-left: 75px;
+    margin-left: 75px;
 }

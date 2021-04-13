@@ -1,4 +1,5 @@
 
+let container=document.getElementById('images-div');
 let leftImageElement = document.getElementById('left-image');
 let centerImageElement = document.getElementById('center-image');
 let rightImageElement = document.getElementById('right-image');
@@ -10,6 +11,13 @@ let leftImageIndex;
 let centerImageIndex;
 let rightImageIndex;
 
+let namesArr = []
+let votesArr = []
+let shownArr = []
+
+let temp = [100,100,100]
+
+
 function Product(name, source){
     this.name = name;
     this.source = source;
@@ -17,6 +25,8 @@ function Product(name, source){
     this.shown = 0;
 
     Product.allProducts.push(this);
+
+    namesArr.push(this.name);
     
 }
 
@@ -48,15 +58,26 @@ function generateRandomIndex(){
 }
 
 function renderImages() {
+
     
     leftImageIndex = generateRandomIndex();
     centerImageIndex = generateRandomIndex();
     rightImageIndex = generateRandomIndex ();
 
+    while (temp.includes(leftImageIndex) || temp.includes(centerImageIndex) || temp.includes(rightImageIndex)){
+        rightImageIndex = generateRandomIndex();
+        centerImageIndex = generateRandomIndex();
+        leftImageIndex = generateRandomIndex();
+    }
+
     while (leftImageIndex == centerImageIndex || leftImageIndex == rightImageIndex || rightImageIndex == centerImageIndex){
         rightImageIndex = generateRandomIndex();
         leftImageIndex = generateRandomIndex();
     }
+
+    
+    
+    
     
     leftImageElement.src = Product.allProducts[leftImageIndex].source;
     centerImageElement.src = Product.allProducts[centerImageIndex].source;
@@ -65,25 +86,24 @@ function renderImages() {
     Product.allProducts[leftImageIndex].shown++
     Product.allProducts[centerImageIndex].shown++
     Product.allProducts[rightImageIndex].shown++
-
     
+    temp = [leftImageIndex,centerImageIndex,rightImageIndex]
 }
 
 renderImages();
 
-leftImageElement.addEventListener('click',handleUserClick)
-centerImageElement.addEventListener('click',handleUserClick)
-rightImageElement.addEventListener('click',handleUserClick)
 
 let divElement = document.getElementById('buttonkey')
 let buttonElement = document.createElement('button')
 
-function handleUserClick(event){
+container.addEventListener('click',handleUserClick)
 
+function handleUserClick(event){
+    
     userRounds++;
 
-    if (userRounds < maxRounds){
-
+    if (userRounds <= maxRounds){
+    
         if (event.target.id === 'left-image'){
             Product.allProducts[leftImageIndex].votes++
         }
@@ -93,18 +113,26 @@ function handleUserClick(event){
         else if (event.target.id === 'right-image'){
             Product.allProducts[rightImageIndex].votes++
         }
-        else {
+        else{
+            alert('please click on the images');
+            userRounds--; 
         }
-
+    
         renderImages();
-
+       
     }else{
         divElement.appendChild(buttonElement)
-        buttonElement.textContent = 'Show results'
-        leftImageElement.removeEventListener('click',handleUserClick);
-        rightImageElement.removeEventListener('click',handleUserClick)
+        buttonElement.textContent = 'Show results in text'
+        container.removeEventListener('Click',handleUserClick);
+
+        for (let i = 0; i < Product.allProducts.length; i++) {
+            votesArr.push(Product.allProducts[i].votes);
+            shownArr.push(Product.allProducts[i].shown);
+          }
+        chart();
     }
 }
+
 
 buttonElement.addEventListener('click',handleResultsClick)
 
@@ -115,7 +143,49 @@ function handleResultsClick() {
     for (let i = 0; i < Product.allProducts.length; i++) {
         let productResult = document.createElement('li')
         list.appendChild(productResult)
-        productResult.textContent = `${Product.allProducts[i].name} had ${Product.allProducts[i].votes}, and was seen ${Product.allProducts[i].shown} times`
+        productResult.textContent = `${Product.allProducts[i].name} had ${Product.allProducts[i].votes} votes, and was seen ${Product.allProducts[i].shown} times`
     }
     buttonElement.removeEventListener('click',handleResultsClick)
 }
+
+function chart() {
+    let ctx = document.getElementById('myChart').getContext('2d');
+    
+    let chart = new Chart(ctx,{
+      // what type is the chart
+     type: 'bar',
+  
+    //  the data for showing
+     data:{
+      //  for the names
+        labels: namesArr,
+        
+        datasets: [
+          {
+          label: 'Product votes',
+          data: votesArr,
+          backgroundColor: [
+            'rgb(138, 44, 226)',
+          ],
+    
+          borderWidth: 1
+        },
+  
+        {
+          label: 'Product shown',
+          data: shownArr,
+          backgroundColor: [
+            'black',
+          ],
+    
+          borderWidth: 1
+        }
+        
+      ]
+      },
+      options: {}
+    });
+    
+  }
+
+ 
