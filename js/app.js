@@ -27,10 +27,28 @@ function Product(name, source){
     Product.allProducts.push(this);
 
     namesArr.push(this.name);
+
+    
     
 }
 
+
 Product.allProducts = [];
+
+function updateStorage() {
+    let arrayString = JSON.stringify(Product.allProducts);
+    localStorage.setItem('votes and shown data',arrayString);
+}
+
+
+function getData(){
+   let data = localStorage.getItem('votes and shown data');
+   let dataObj = JSON.parse(data);
+
+   if(dataObj !== null){
+     Product.allProducts = dataObj
+   }
+}
 
 new Product('bag', 'img/bag.jpg');
 new Product('banana', 'img/banana.jpg');
@@ -74,10 +92,6 @@ function renderImages() {
         rightImageIndex = generateRandomIndex();
         leftImageIndex = generateRandomIndex();
     }
-
-    
-    
-    
     
     leftImageElement.src = Product.allProducts[leftImageIndex].source;
     centerImageElement.src = Product.allProducts[centerImageIndex].source;
@@ -129,6 +143,7 @@ function handleUserClick(event){
             votesArr.push(Product.allProducts[i].votes);
             shownArr.push(Product.allProducts[i].shown);
           }
+        updateStorage();
         chart();
     }
 }
@@ -188,4 +203,4 @@ function chart() {
     
   }
 
- 
+ getData();
